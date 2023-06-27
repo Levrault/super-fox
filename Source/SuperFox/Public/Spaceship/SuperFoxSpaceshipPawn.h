@@ -13,6 +13,4 @@ UCLASS()
 class SUPERFOX_API ASuperFoxSpaceshipPawn : public ABaseSpaceshipPawn
 {
 	GENERATED_BODY()
-	
-private:
 };
