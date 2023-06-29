@@ -22,7 +22,14 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+	void SnapToSpline();
+
+	UPROPERTY(EditAnywhere, Category = "Spline Track", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float CameraPoint;
 	
 	UPROPERTY(EditAnywhere, Category = "Spline Track")
 	class ASplineTrack* SplineComponent;
+
 };

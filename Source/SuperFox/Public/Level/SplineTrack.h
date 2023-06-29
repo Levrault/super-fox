@@ -22,7 +22,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	class USplineComponent* GetSplineTrackComponent() const { return SplineTrackComponent; }
 	
 	UPROPERTY(EditAnywhere, Category = "Spline Track")
-	class USplineComponent* SplineTrackComponent;
+	USplineComponent* SplineTrackComponent;
 };
