@@ -31,7 +31,6 @@ void ASplineTrack::Tick(float DeltaTime)
 
 }
 
-
 void ASplineTrack::SnapCameraToSpline(APlayerCamera* PlayerCamera, float CameraPoint)
 {
 	if (PlayerCamera == nullptr) {
@@ -58,9 +57,9 @@ void ASplineTrack::SnapPawnToSpline(APawn* PlayerPawn, float CameraPoint)
 
 	FVector locationAlongSline = SplineTrackComponent->GetLocationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
 	FRotator rotationAlongSpline = SplineTrackComponent->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
-
-	PlayerPawn->SetActorLocation(locationAlongSline);
-	PlayerPawn->SetActorRotation(rotationAlongSpline);
+	
+	PlayerPawn->GetRootComponent()->SetWorldRotation(rotationAlongSpline);
+	PlayerPawn->GetRootComponent()->SetWorldLocation(locationAlongSline);
 }
 
 float ASplineTrack::GetDistanceAlongSpline(float CameraPoint)

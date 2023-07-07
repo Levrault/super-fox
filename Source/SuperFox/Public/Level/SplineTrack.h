@@ -29,7 +29,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	USplineComponent* GetSplineTrackComponent() const { return SplineTrackComponent; }
+	class USplineComponent* GetSplineTrackComponent() const { return SplineTrackComponent; }
 
 	UFUNCTION()
 	void SnapCameraToSpline(class APlayerCamera* PlayerCamera, float CameraPoint);
