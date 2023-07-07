@@ -20,14 +20,16 @@ APlayerCamera::APlayerCamera()
 void APlayerCamera::BeginPlay()
 {
 	Super::BeginPlay();
-	SnapToSpline();
+
+	if (SplineTrackComponent) {
+		SplineTrackComponent->SnapCameraToSpline(this, CameraPoint);
+	}
 }
 
 // Called every frame
 void APlayerCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void APlayerCamera::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -37,32 +39,15 @@ void APlayerCamera::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(APlayerCamera, SplineTrackComponent)) {
 		if (SplineTrackComponent) {
 			UE_LOG(LogTemp, Warning, TEXT("Spline Track Component changed, snapping to new spline"));
-			SnapToSpline();
+			SplineTrackComponent->SnapCameraToSpline(this, CameraPoint);
 		}
 	}
 
 	if (PropertyName == GET_MEMBER_NAME_CHECKED(APlayerCamera, CameraPoint)) {
 		UE_LOG(LogTemp, Warning, TEXT("Spline Track Component changed, snapping to new spline"));
-		SnapToSpline();
+		if (SplineTrackComponent) {
+			SplineTrackComponent->SnapCameraToSpline(this, CameraPoint);
+		}
 	}
-
 }
 
-void APlayerCamera::SnapToSpline()
-{
-	if (SplineTrackComponent == nullptr) {
-		return;
-	}
-
-	USplineComponent* splineTrack = SplineTrackComponent->GetSplineTrackComponent();
-	float splineLenght = splineTrack->GetSplineLength();
-	
-	float distance = FMath::Lerp(0, splineLenght, CameraPoint);
-
-	FVector locationAlongSline = splineTrack->GetLocationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
-	FRotator rotationAlongSpline = splineTrack->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
-	
-	UCameraComponent* cameraComponent = GetCameraComponent();
-	cameraComponent->SetWorldRotation(rotationAlongSpline);
-	cameraComponent->SetWorldLocation(locationAlongSline);
-}

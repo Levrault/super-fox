@@ -19,12 +19,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+private:
+	UPROPERTY(EditAnywhere, Category = "Spline Track")
+	class USplineComponent* SplineTrackComponent;
+
+	float GetDistanceAlongSpline(float CameraPoint);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	class USplineComponent* GetSplineTrackComponent() const { return SplineTrackComponent; }
-	
-	UPROPERTY(EditAnywhere, Category = "Spline Track")
-	USplineComponent* SplineTrackComponent;
+	USplineComponent* GetSplineTrackComponent() const { return SplineTrackComponent; }
+
+	UFUNCTION()
+	void SnapCameraToSpline(class APlayerCamera* PlayerCamera, float CameraPoint);
+
+	UFUNCTION()
+	void SnapPawnToSpline(class APawn* PlayerPawn, float CameraPoint);
 };

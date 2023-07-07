@@ -24,9 +24,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
-	UFUNCTION()
-	void SnapToSpline();
-
 	UPROPERTY(EditAnywhere, Category = "Spline Track")
 	class ASplineTrack* SplineTrackComponent;
 
