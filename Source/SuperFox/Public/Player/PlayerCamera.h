@@ -29,4 +29,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Spline Track", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float CameraPoint;
+
+private:
+	APawn* playerPawn;
 };

@@ -5,6 +5,7 @@
 #include "Components/SplineComponent.h"
 #include "Player/PlayerCamera.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -60,6 +61,26 @@ void ASplineTrack::SnapPawnToSpline(APawn* PlayerPawn, float CameraPoint)
 	
 	PlayerPawn->GetRootComponent()->SetWorldRotation(rotationAlongSpline);
 	PlayerPawn->GetRootComponent()->SetWorldLocation(locationAlongSline);
+}
+
+
+void ASplineTrack::FollowTargetPawnAlongSpline(APawn* PlayerPawn, APlayerCamera* Camera, float InterpSpeed, FVector CameraOffset) {
+	if (PlayerPawn == nullptr) {
+		return;
+	}
+	if (Camera == nullptr) {
+		return;
+	}
+
+	FVector playerPositionAlongSpline = SplineTrackComponent->FindLocationClosestToWorldLocation(PlayerPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+
+	auto positionAlongSpline = FMath::VInterpTo(
+		Camera->GetCameraComponent()->GetComponentLocation(),
+		playerPositionAlongSpline,
+		UGameplayStatics::GetWorldDeltaSeconds(this),
+		InterpSpeed
+	);
+	Camera->GetCameraComponent()->SetWorldLocation(positionAlongSpline - CameraOffset);
 }
 
 float ASplineTrack::GetDistanceAlongSpline(float CameraPoint)

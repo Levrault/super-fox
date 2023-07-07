@@ -36,4 +36,7 @@ public:
 
 	UFUNCTION()
 	void SnapPawnToSpline(class APawn* PlayerPawn, float CameraPoint);
+
+	UFUNCTION()
+	void FollowTargetPawnAlongSpline(APawn* PlayerPawn, APlayerCamera* Camera, float InterpSpeed, FVector CameraOffset);
 };

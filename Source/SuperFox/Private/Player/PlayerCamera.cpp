@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Player/PlayerCamera.h"
 #include "Level/SplineTrack.h"
 #include "Math/UnrealMathVectorCommon.h"
 #include "Components/SplineComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerCamera::APlayerCamera()
@@ -21,6 +21,12 @@ void APlayerCamera::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Set as default camera for the current pawn
+	if (APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0)) {
+		playerController->SetViewTarget(this);
+		playerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	}
+
 	if (SplineTrackComponent) {
 		SplineTrackComponent->SnapCameraToSpline(this, CameraPoint);
 	}
@@ -30,6 +36,12 @@ void APlayerCamera::BeginPlay()
 void APlayerCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (playerPawn) {
+		// TODO: Replace InterpSpeed, Calcule de la distance par defaut
+		SplineTrackComponent->FollowTargetPawnAlongSpline(playerPawn, this, 100.0f, FVector(0, -3000, 0));
+	}
+
 }
 
 void APlayerCamera::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -50,4 +62,3 @@ void APlayerCamera::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 		}
 	}
 }
-
