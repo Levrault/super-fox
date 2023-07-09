@@ -12,17 +12,16 @@
 #include "Components/SplineComponent.h"
 
 
-
 ASuperFoxSpaceshipPawn::ASuperFoxSpaceshipPawn()
 {
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
-	RootComponent = CapsuleComponent;
+	RootScene = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	RootComponent = RootScene;
 	
 	StaticBaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
-	StaticBaseMesh->SetupAttachment(RootComponent);
+	StaticBaseMesh->SetupAttachment(RootScene);
 
 	SpaceshipMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Floating Pawn Movement"));
-	SpaceshipMovement->SetUpdatedComponent(RootComponent);
+	SpaceshipMovement->SetUpdatedComponent(StaticBaseMesh);
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("Spring Arms");
 	SpringArmComponent->SetupAttachment(RootComponent);
@@ -64,7 +63,15 @@ void ASuperFoxSpaceshipPawn::BeginPlay()
 void ASuperFoxSpaceshipPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	SpaceshipMovement->AddInputVector(GetActorForwardVector());
+
+		
+	if (SplineTrackComponent) {
+		CameraPoint += DeltaTime * 0.05f;
+		SplineTrackComponent->SnapPawnToSpline(this, CameraPoint);
+		CapsuleComponent->SetRelativeTransform(RootScene->GetRelativeTransform());
+	}
+
+	//SpaceshipMovement->AddInputVector(GetActorForwardVector());
 }
 
 // Called to bind functionality to input

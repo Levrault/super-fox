@@ -61,7 +61,8 @@ void ASplineTrack::SnapPawnToSpline(APawn* PlayerPawn, float CameraPoint)
 	//FRotator rotationAlongSpline = SplineTrackComponent->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
 	
 	//PlayerPawn->SetActorRotation(rotationAlongSpline);
-	PlayerPawn->SetActorLocation(locationAlongSline);
+	//PlayerPawn->SetActorLocation(locationAlongSline);
+	PlayerPawn->GetRootComponent()->SetWorldLocation(locationAlongSline);
 }
 
 
