@@ -31,5 +31,5 @@ public:
 	float CameraPoint;
 
 private:
-	APawn* playerPawn;
+	class ASuperFoxSpaceshipPawn* PlayerPawn;
 };

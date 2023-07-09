@@ -69,4 +69,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Rail Settings", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float CameraPoint;
 
+	UPROPERTY(EditAnywhere, Category = "Rail Settings")
+	float PlayerSpeed = 2000.f;
 };

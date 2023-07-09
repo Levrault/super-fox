@@ -6,6 +6,7 @@
 #include "Components/SplineComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Spaceship/SuperFoxSpaceshipPawn.h"
 
 // Sets default values
 APlayerCamera::APlayerCamera()
@@ -24,7 +25,7 @@ void APlayerCamera::BeginPlay()
 	// Set as default camera for the current pawn
 	if (APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0)) {
 		playerController->SetViewTarget(this);
-		playerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+		PlayerPawn = Cast<ASuperFoxSpaceshipPawn>(UGameplayStatics::GetPlayerPawn(this, 0));
 	}
 
 	if (SplineTrackComponent) {
@@ -37,9 +38,9 @@ void APlayerCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (playerPawn) {
+	if (PlayerPawn) {
 		// TODO: Replace InterpSpeed, Calcule de la distance par defaut
-		SplineTrackComponent->FollowTargetPawnAlongSpline(playerPawn, this, 100.0f, FVector(0, -3000, 0));
+		SplineTrackComponent->FollowTargetPawnAlongSpline(PlayerPawn, this, PlayerPawn->PlayerSpeed, FVector(0, -3000, 0));
 	}
 
 }

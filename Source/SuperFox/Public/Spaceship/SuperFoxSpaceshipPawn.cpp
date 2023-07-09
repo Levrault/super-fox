@@ -8,23 +8,27 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/SplineComponent.h"
+
+
 
 ASuperFoxSpaceshipPawn::ASuperFoxSpaceshipPawn()
 {
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule Collider"));
 	RootComponent = CapsuleComponent;
-
+	
 	StaticBaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
 	StaticBaseMesh->SetupAttachment(RootComponent);
+
+	SpaceshipMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Floating Pawn Movement"));
+	SpaceshipMovement->SetUpdatedComponent(RootComponent);
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("Spring Arms");
 	SpringArmComponent->SetupAttachment(RootComponent);
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
-
-	SpaceshipMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Floating Pawn Movement"));
-	SpaceshipMovement->SetUpdatedComponent(RootComponent);
 }
 
 void ASuperFoxSpaceshipPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -45,7 +49,6 @@ void ASuperFoxSpaceshipPawn::PostEditChangeProperty(FPropertyChangedEvent& Prope
 		}
 	}
 }
-
 
 // Called when the game starts or when spawned
 void ASuperFoxSpaceshipPawn::BeginPlay()
@@ -83,7 +86,6 @@ void ASuperFoxSpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void ASuperFoxSpaceshipPawn::Move(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("allo"));
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Value.Get<FVector2D>().ToString());
 
 	FVector2D input = Value.Get<FVector2D>();

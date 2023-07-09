@@ -56,13 +56,29 @@ void ASplineTrack::SnapPawnToSpline(APawn* PlayerPawn, float CameraPoint)
 
 	float distance = GetDistanceAlongSpline(CameraPoint);
 
+
 	FVector locationAlongSline = SplineTrackComponent->GetLocationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
-	FRotator rotationAlongSpline = SplineTrackComponent->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
+	//FRotator rotationAlongSpline = SplineTrackComponent->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
 	
-	PlayerPawn->GetRootComponent()->SetWorldRotation(rotationAlongSpline);
-	PlayerPawn->GetRootComponent()->SetWorldLocation(locationAlongSline);
+	//PlayerPawn->SetActorRotation(rotationAlongSpline);
+	PlayerPawn->SetActorLocation(locationAlongSline);
 }
 
+
+void ASplineTrack::SnapActorToSpline(AActor* Actor, float CameraPoint)
+{
+	if (Actor == nullptr) {
+		return;
+	}
+
+	float distance = GetDistanceAlongSpline(CameraPoint);
+
+	FVector locationAlongSline = SplineTrackComponent->GetLocationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
+	FRotator rotationAlongSpline = SplineTrackComponent->GetRotationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
+
+	Actor->SetActorRotation(rotationAlongSpline);
+	Actor->SetActorLocation(locationAlongSline);
+}
 
 void ASplineTrack::FollowTargetPawnAlongSpline(APawn* PlayerPawn, APlayerCamera* Camera, float InterpSpeed, FVector CameraOffset) {
 	if (PlayerPawn == nullptr) {
@@ -74,7 +90,7 @@ void ASplineTrack::FollowTargetPawnAlongSpline(APawn* PlayerPawn, APlayerCamera*
 
 	FVector playerPositionAlongSpline = SplineTrackComponent->FindLocationClosestToWorldLocation(PlayerPawn->GetActorLocation(), ESplineCoordinateSpace::World);
 
-	auto positionAlongSpline = FMath::VInterpTo(
+	FVector positionAlongSpline = FMath::VInterpTo(
 		Camera->GetCameraComponent()->GetComponentLocation(),
 		playerPositionAlongSpline,
 		UGameplayStatics::GetWorldDeltaSeconds(this),
