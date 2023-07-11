@@ -40,7 +40,7 @@ void APlayerCamera::Tick(float DeltaTime)
 
 	if (PlayerPawn) {
 		// TODO: Replace InterpSpeed, Calcule de la distance par defaut
-		SplineTrackComponent->FollowTargetPawnAlongSpline(PlayerPawn, this, PlayerPawn->PlayerSpeed, FVector(0, -3000, 0));
+		SplineTrackComponent->FollowTargetPawnAlongSpline(PlayerPawn, this, PlayerPawn->ForwardSpeed, FVector(0, -3000, 0));
 	}
 
 }

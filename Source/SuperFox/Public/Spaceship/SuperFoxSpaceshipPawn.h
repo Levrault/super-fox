@@ -41,6 +41,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
 	class UFloatingPawnMovement* SpaceshipMovement;
 
+	float ViewportMaxX;
+	float ViewportMaxY;
+
 public:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	// Called every frame
@@ -62,7 +65,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* InputFire;
 
+	UPROPERTY(EditAnywhere, Category = "Movements")
+	float AxisMovementSpeed = 2000.f;
+
 	// Rails
+	UPROPERTY(EditAnywhere, Category = "Rail Settings")
+	FVector2D TrackInset;
+
 	UPROPERTY(EditAnywhere, Category = "Rail Settings")
 	class ASplineTrack* SplineTrackComponent;
 
@@ -70,5 +79,6 @@ public:
 	float CameraPoint;
 
 	UPROPERTY(EditAnywhere, Category = "Rail Settings")
-	float PlayerSpeed = 2000.f;
+	float ForwardSpeed = 2000.f;
+
 };
