@@ -18,7 +18,7 @@ ASuperFoxSpaceshipPawn::ASuperFoxSpaceshipPawn()
 	RootComponent = RootScene;
 	
 	StaticBaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base Mesh"));
-	StaticBaseMesh->SetupAttachment(RootScene);
+	StaticBaseMesh->SetupAttachment(RootComponent);
 
 	SpaceshipMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Floating Pawn Movement"));
 	SpaceshipMovement->SetUpdatedComponent(StaticBaseMesh);
@@ -68,7 +68,6 @@ void ASuperFoxSpaceshipPawn::Tick(float DeltaTime)
 	if (SplineTrackComponent) {
 		CameraPoint += DeltaTime * 0.05f;
 		SplineTrackComponent->SnapPawnToSpline(this, CameraPoint);
-		CapsuleComponent->SetRelativeTransform(RootScene->GetRelativeTransform());
 	}
 
 	//SpaceshipMovement->AddInputVector(GetActorForwardVector());
