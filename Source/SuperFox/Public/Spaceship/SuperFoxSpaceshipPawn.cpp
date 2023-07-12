@@ -10,6 +10,7 @@
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/SplineComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 ASuperFoxSpaceshipPawn::ASuperFoxSpaceshipPawn()
@@ -97,30 +98,29 @@ void ASuperFoxSpaceshipPawn::Move(const FInputActionValue& Value)
 	FVector2D input = Value.Get<FVector2D>();
 	bool shouldSkipInput = false;
 	
-	// see how to allow Y movement when X is blocked
 	if (screenLocation.X < TrackInset.X && input.X < 0) {
 		SpaceshipMovement->Velocity.X = LerpSpaceshipVelocityToZero().X;
 		shouldSkipInput = true;
-	} else if (screenLocation.X > ViewportMaxX && input.X > 0) {
+	} 
+	else if (screenLocation.X > ViewportMaxX && input.X > 0) {
 		SpaceshipMovement->Velocity.X = LerpSpaceshipVelocityToZero().X;
 		shouldSkipInput = true;
+	}
+	else {
+		SpaceshipMovement->AddInputVector(GetActorRightVector() * input.X);
 	}
 
 	if (screenLocation.Y < TrackInset.Y && input.Y > 0) {
 		SpaceshipMovement->Velocity.Y = LerpSpaceshipVelocityToZero().Y;
 		shouldSkipInput = true;
-	} else if (screenLocation.Y > ViewportMaxY && input.Y < 0) {
+	} 
+	else if (screenLocation.Y > ViewportMaxY && input.Y < 0) {
 		SpaceshipMovement->Velocity.Y = LerpSpaceshipVelocityToZero().Y;
 		shouldSkipInput = true;
 	}
-
-	if (shouldSkipInput) {
-		return;
+	else {
+		SpaceshipMovement->AddInputVector(GetActorUpVector() * input.Y);
 	}
-
-	SpaceshipMovement->AddInputVector(GetActorRightVector() * input.X);
-	SpaceshipMovement->AddInputVector(GetActorUpVector() * input.Y);
-
 }
 
 void ASuperFoxSpaceshipPawn::Fire(const FInputActionValue& Value)
