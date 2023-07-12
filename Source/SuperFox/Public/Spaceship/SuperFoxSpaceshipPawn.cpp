@@ -22,12 +22,6 @@ ASuperFoxSpaceshipPawn::ASuperFoxSpaceshipPawn()
 
 	SpaceshipMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Floating Pawn Movement"));
 	SpaceshipMovement->SetUpdatedComponent(StaticBaseMesh);
-
-	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("Spring Arms");
-	SpringArmComponent->SetupAttachment(RootComponent);
-
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
-	CameraComponent->SetupAttachment(SpringArmComponent);
 }
 
 void ASuperFoxSpaceshipPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -78,12 +72,6 @@ void ASuperFoxSpaceshipPawn::Tick(float DeltaTime)
 		CameraPoint += DeltaTime * 0.05f;
 		SplineTrackComponent->SnapPawnToSpline(this, CameraPoint);
 	}
-
-
-	if (SpaceshipMovement->MaxSpeed != AxisMovementSpeed) {
-		SpaceshipMovement->MaxSpeed = AxisMovementSpeed;
-	}
-
 }
 
 // Called to bind functionality to input
@@ -105,35 +93,28 @@ void ASuperFoxSpaceshipPawn::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void ASuperFoxSpaceshipPawn::Move(const FInputActionValue& Value)
 {
-
-	APlayerController* playerController = Cast<APlayerController>(GetController());
-	
-	FVector2D screenLocation;
-	playerController->ProjectWorldLocationToScreen(StaticBaseMesh->GetComponentLocation(), screenLocation);
-	UE_LOG(LogTemp, Warning, TEXT("Screen Location: X=%f, Y=%f"), screenLocation.X, screenLocation.Y);
-
+	FVector2D screenLocation = GetWorldLocationToScreen();
 	FVector2D input = Value.Get<FVector2D>();
-	if (screenLocation.X <= TrackInset.X) {
-		SpaceshipMovement->MaxSpeed = AxisMovementSpeed / 3;
-		SpaceshipMovement->AddInputVector(GetActorRightVector());
-		return;
+	bool shouldSkipInput = false;
+	
+	// see how to allow Y movement when X is blocked
+	if (screenLocation.X < TrackInset.X && input.X < 0) {
+		SpaceshipMovement->Velocity.X = LerpSpaceshipVelocityToZero().X;
+		shouldSkipInput = true;
+	} else if (screenLocation.X > ViewportMaxX && input.X > 0) {
+		SpaceshipMovement->Velocity.X = LerpSpaceshipVelocityToZero().X;
+		shouldSkipInput = true;
 	}
 
-	if (screenLocation.X >= ViewportMaxX) {
-		SpaceshipMovement->MaxSpeed = AxisMovementSpeed / 3;
-		SpaceshipMovement->AddInputVector(GetActorRightVector() * -1);
-		return;
+	if (screenLocation.Y < TrackInset.Y && input.Y > 0) {
+		SpaceshipMovement->Velocity.Y = LerpSpaceshipVelocityToZero().Y;
+		shouldSkipInput = true;
+	} else if (screenLocation.Y > ViewportMaxY && input.Y < 0) {
+		SpaceshipMovement->Velocity.Y = LerpSpaceshipVelocityToZero().Y;
+		shouldSkipInput = true;
 	}
 
-	if (screenLocation.Y <= TrackInset.Y) {
-		SpaceshipMovement->MaxSpeed = AxisMovementSpeed / 3;
-		SpaceshipMovement->AddInputVector(GetActorUpVector() * -1);
-		return;
-	}
-
-	if (screenLocation.Y > ViewportMaxY) {
-		SpaceshipMovement->MaxSpeed = AxisMovementSpeed / 3;
-		SpaceshipMovement->AddInputVector(GetActorUpVector());
+	if (shouldSkipInput) {
 		return;
 	}
 
@@ -142,9 +123,28 @@ void ASuperFoxSpaceshipPawn::Move(const FInputActionValue& Value)
 
 }
 
-
-void  ASuperFoxSpaceshipPawn::Fire(const FInputActionValue& Value)
+void ASuperFoxSpaceshipPawn::Fire(const FInputActionValue& Value)
 {
 	UE_LOG(LogTemp, Warning, TEXT("fire pressed"));
 
+}
+
+FVector2D ASuperFoxSpaceshipPawn::GetWorldLocationToScreen() const
+{
+	FVector2D screenLocation;
+	APlayerController* playerController = Cast<APlayerController>(GetController());
+
+	if (playerController == nullptr) {
+		UE_LOG(LogTemp, Error, TEXT("ASuperFoxSpaceshipPawn::GetWorldLocationToScreen - playerController is nullprt"));
+		return screenLocation;
+	}
+
+	playerController->ProjectWorldLocationToScreen(StaticBaseMesh->GetComponentLocation(), screenLocation);
+	return screenLocation;
+}
+
+FVector ASuperFoxSpaceshipPawn::LerpSpaceshipVelocityToZero() const
+{
+	FVector newSpeed = FMath::Lerp(SpaceshipMovement->Velocity, 0.0f, AxisDecelerationOnScreenEdges * UGameplayStatics::GetWorldDeltaSeconds(this));
+	return newSpeed;
 }

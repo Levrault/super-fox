@@ -2,7 +2,6 @@
 
 #include "Player/PlayerCamera.h"
 #include "Level/SplineTrack.h"
-#include "Math/UnrealMathVectorCommon.h"
 #include "Components/SplineComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"

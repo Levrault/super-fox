@@ -29,12 +29,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
 	class USceneComponent* RootScene;
 
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	class USpringArmComponent* SpringArmComponent;
-	
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	class UCameraComponent* CameraComponent;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent* StaticBaseMesh;
 
@@ -55,6 +49,12 @@ public:
 	UFUNCTION()
 	UFloatingPawnMovement* GetSpaceshipMovement() const { return SpaceshipMovement;  }
 
+	UFUNCTION()
+	FVector2D GetWorldLocationToScreen() const;
+	
+	UFUNCTION()
+	FVector LerpSpaceshipVelocityToZero() const;
+
 	// Enhanced Inputs
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -66,7 +66,10 @@ public:
 	UInputAction* InputFire;
 
 	UPROPERTY(EditAnywhere, Category = "Movements")
-	float AxisMovementSpeed = 2000.f;
+	float AxisMovementSpeed = 1200.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Rail Settings", meta = (ClampMin = "0.1", ClampMax = "1.0"))
+	float AxisDecelerationOnScreenEdges = 0.2f;
 
 	// Rails
 	UPROPERTY(EditAnywhere, Category = "Rail Settings")
