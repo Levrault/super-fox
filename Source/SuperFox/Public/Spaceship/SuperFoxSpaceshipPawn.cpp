@@ -23,6 +23,9 @@ ASuperFoxSpaceshipPawn::ASuperFoxSpaceshipPawn()
 
 	SpaceshipMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("Floating Pawn Movement"));
 	SpaceshipMovement->SetUpdatedComponent(StaticBaseMesh);
+
+	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	Camera->SetupAttachment(RootComponent);
 }
 
 void ASuperFoxSpaceshipPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -96,15 +99,12 @@ void ASuperFoxSpaceshipPawn::Move(const FInputActionValue& Value)
 {
 	FVector2D screenLocation = GetWorldLocationToScreen();
 	FVector2D input = Value.Get<FVector2D>();
-	bool shouldSkipInput = false;
 	
 	if (screenLocation.X < TrackInset.X && input.X < 0) {
 		SpaceshipMovement->Velocity.X = LerpSpaceshipVelocityToZero().X;
-		shouldSkipInput = true;
 	} 
 	else if (screenLocation.X > ViewportMaxX && input.X > 0) {
 		SpaceshipMovement->Velocity.X = LerpSpaceshipVelocityToZero().X;
-		shouldSkipInput = true;
 	}
 	else {
 		SpaceshipMovement->AddInputVector(GetActorRightVector() * input.X);
@@ -112,15 +112,15 @@ void ASuperFoxSpaceshipPawn::Move(const FInputActionValue& Value)
 
 	if (screenLocation.Y < TrackInset.Y && input.Y > 0) {
 		SpaceshipMovement->Velocity.Y = LerpSpaceshipVelocityToZero().Y;
-		shouldSkipInput = true;
 	} 
 	else if (screenLocation.Y > ViewportMaxY && input.Y < 0) {
 		SpaceshipMovement->Velocity.Y = LerpSpaceshipVelocityToZero().Y;
-		shouldSkipInput = true;
 	}
 	else {
 		SpaceshipMovement->AddInputVector(GetActorUpVector() * input.Y);
 	}
+
+	RotateSpaceshipBasedOnInput(input);
 }
 
 void ASuperFoxSpaceshipPawn::Fire(const FInputActionValue& Value)
@@ -147,4 +147,15 @@ FVector ASuperFoxSpaceshipPawn::LerpSpaceshipVelocityToZero() const
 {
 	FVector newSpeed = FMath::Lerp(SpaceshipMovement->Velocity, 0.0f, AxisDecelerationOnScreenEdges * UGameplayStatics::GetWorldDeltaSeconds(this));
 	return newSpeed;
+}
+
+void ASuperFoxSpaceshipPawn::RotateSpaceshipBasedOnInput(const FVector2D Input)
+{
+	const float InterpolationSpeed = 0.5f;
+
+	float roll = FMath::FInterpTo(StaticBaseMesh->GetComponentRotation().Roll, 20.f * Input.X, UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed);
+	float yaw = FMath::FInterpTo(StaticBaseMesh->GetComponentRotation().Yaw, 20.f * Input.Y, UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed);
+
+
+	StaticBaseMesh->SetWorldRotation(FRotator(roll, yaw, 0));
 }

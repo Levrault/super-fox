@@ -26,14 +26,17 @@ protected:
 	void Fire(const FInputActionValue& Value);
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, Category = "Components", meta = (AllowPrivateAccess = true))
 	class USceneComponent* RootScene;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, Category = "Components", meta = (AllowPrivateAccess = true))
 	UStaticMeshComponent* StaticBaseMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = true))
+	UPROPERTY(VisibleAnywhere, Category = "Components", meta = (AllowPrivateAccess = true))
 	class UFloatingPawnMovement* SpaceshipMovement;
+
+	UPROPERTY(VisibleAnywhere, Category = "Components", meta = (AllowPrivateAccess = true))
+	class UCameraComponent* Camera;
 
 	float ViewportMaxX;
 	float ViewportMaxY;
@@ -54,6 +57,9 @@ public:
 	
 	UFUNCTION()
 	FVector LerpSpaceshipVelocityToZero() const;
+
+	UFUNCTION()
+	void RotateSpaceshipBasedOnInput(const FVector2D Input);
 
 	// Enhanced Inputs
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
