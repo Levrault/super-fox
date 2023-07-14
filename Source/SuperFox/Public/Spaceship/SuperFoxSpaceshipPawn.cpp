@@ -58,8 +58,10 @@ void ASuperFoxSpaceshipPawn::BeginPlay()
 	playerController->GetViewportSize(originalViewportWidth, originalViewportHeight);
 	ViewportMaxX = static_cast<float>(originalViewportWidth) - TrackInset.X;
 	ViewportMaxY = static_cast<float>(originalViewportHeight) - TrackInset.Y;
-
+	
+	// params
 	SpaceshipMovement->MaxSpeed = AxisMovementSpeed;
+	InitialSpaceshipRotation = StaticBaseMesh->GetComponentRotation();
 
 	if (SplineTrackComponent) {
 		SplineTrackComponent->SnapPawnToSpline(this, CameraPoint);
@@ -76,6 +78,8 @@ void ASuperFoxSpaceshipPawn::Tick(float DeltaTime)
 		CameraPoint += DeltaTime * 0.05f;
 		SplineTrackComponent->SnapPawnToSpline(this, CameraPoint);
 	}
+
+	SpaceshipTiltAnimation();
 }
 
 // Called to bind functionality to input
@@ -120,7 +124,6 @@ void ASuperFoxSpaceshipPawn::Move(const FInputActionValue& Value)
 		SpaceshipMovement->AddInputVector(GetActorUpVector() * input.Y);
 	}
 
-	RotateSpaceshipBasedOnInput(input);
 }
 
 void ASuperFoxSpaceshipPawn::Fire(const FInputActionValue& Value)
@@ -149,13 +152,40 @@ FVector ASuperFoxSpaceshipPawn::LerpSpaceshipVelocityToZero() const
 	return newSpeed;
 }
 
-void ASuperFoxSpaceshipPawn::RotateSpaceshipBasedOnInput(const FVector2D Input)
+void ASuperFoxSpaceshipPawn::SpaceshipTiltAnimation()
 {
-	const float InterpolationSpeed = 0.5f;
+	const float MAX_ROTATION_PITCH = 0.15f;
+	const float MAX_ROTATION_YAW = 0.8f;
+	const float interpolationSpeed = 500.f;
+	FRotator currentRotation = StaticBaseMesh->GetComponentRotation();
 
-	float roll = FMath::FInterpTo(StaticBaseMesh->GetComponentRotation().Roll, 20.f * Input.X, UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed);
-	float yaw = FMath::FInterpTo(StaticBaseMesh->GetComponentRotation().Yaw, 20.f * Input.Y, UGameplayStatics::GetWorldDeltaSeconds(this), InterpolationSpeed);
+	float roll = 0.f;
+	float pitch = 0.f;
 
 
-	StaticBaseMesh->SetWorldRotation(FRotator(roll, yaw, 0));
+	// reset to original position
+	if (FMath::IsNearlyZero(SpaceshipMovement->Velocity.Z)) {
+		float targetPitch = (currentRotation.Pitch - InitialSpaceshipRotation.Pitch) * -1;
+		pitch = FMath::FInterpTo(InitialSpaceshipRotation.Pitch, currentRotation.Pitch, UGameplayStatics::GetWorldDeltaSeconds(this), interpolationSpeed);
+
+		UE_LOG(LogTemp, Warning, TEXT("spaceship yaw:%f pitch:%f roll:%f"), currentRotation.Yaw, currentRotation.Pitch, currentRotation.Roll);
+		UE_LOG(LogTemp, Warning, TEXT("initial spaceship yaw:%f pitch:%f roll:%f"), InitialSpaceshipRotation.Yaw, InitialSpaceshipRotation.Pitch, InitialSpaceshipRotation.Roll);
+		UE_LOG(LogTemp, Warning, TEXT("targetPitch:%f"), targetPitch);
+		UE_LOG(LogTemp, Warning, TEXT("reset pitch:%f"), pitch);
+
+		FRotator rotationAmount = currentRotation + FRotator(pitch, 0.f, 0.f);
+		StaticBaseMesh->SetWorldRotation(rotationAmount);
+
+		return;
+	}
+
+	pitch = FMath::FInterpTo(currentRotation.Pitch, MAX_ROTATION_YAW * SpaceshipMovement->GetLastInputVector().Z, UGameplayStatics::GetWorldDeltaSeconds(this), interpolationSpeed);
+	roll = FMath::FInterpTo(currentRotation.Roll, MAX_ROTATION_PITCH * SpaceshipMovement->GetLastInputVector().X, UGameplayStatics::GetWorldDeltaSeconds(this), interpolationSpeed);
+	FRotator rotationAmount = currentRotation + FRotator(pitch, 0.f, roll);
+
+	UE_LOG(LogTemp, Warning, TEXT("last input vector x:%f y:%f z:%f"), SpaceshipMovement->GetLastInputVector().X, SpaceshipMovement->GetLastInputVector().Y, SpaceshipMovement->GetLastInputVector().Z);
+	UE_LOG(LogTemp, Warning, TEXT("pitch:%f roll:%f"), pitch, roll);
+	UE_LOG(LogTemp, Warning, TEXT("spaceship yaw:%f pitch:%f roll:%f"), currentRotation.Yaw, currentRotation.Pitch, currentRotation.Roll);
+
+	StaticBaseMesh->SetWorldRotation(rotationAmount);
 }

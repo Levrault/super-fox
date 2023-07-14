@@ -40,6 +40,7 @@ private:
 
 	float ViewportMaxX;
 	float ViewportMaxY;
+	FRotator InitialSpaceshipRotation;
 
 public:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -59,7 +60,7 @@ public:
 	FVector LerpSpaceshipVelocityToZero() const;
 
 	UFUNCTION()
-	void RotateSpaceshipBasedOnInput(const FVector2D Input);
+	void SpaceshipTiltAnimation();
 
 	// Enhanced Inputs
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input", meta = (AllowPrivateAccess = "true"))
